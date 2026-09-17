@@ -1,0 +1,19 @@
+{
+  "name": "miniprogram-ts-quickstart",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "",
+  "devDependencies": {
+    "miniprogram-api-typings": "^5.2.3"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.23",
+    "miniprogram-recycle-view": "^0.1.5",
+    "mobx-miniprogram": "^6.12.3",
+    "mobx-miniprogram-bindings": "^7.0.0",
+    "tdesign-miniprogram": "^1.16.1"
+  }
+}
