@@ -3,7 +3,9 @@
     "strictNullChecks": true,
     "noImplicitAny": true,
     "module": "CommonJS",
-    "target": "ES2020",
+    // ES2017：让 tsc 把类字段/?./??/数字分隔符/对象展开等新语法都编译掉，
+    // 否则 es6:false 老引擎预览直接 SyntaxError。lib 保持 ES2020（仅类型）。
+    "target": "ES2017",
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,

@@ -1,0 +1,14 @@
+<view wx:if="{{hasConn}}" class="bar {{theme}}" bindtap="goPlayer">
+  <view class="prog"><view class="fill" style="width:{{progress}}%"></view></view>
+  <view class="main">
+    <view class="cover">🎵</view>
+    <view class="meta">
+      <view class="t">{{title}}</view>
+      <view class="s">{{sub}}</view>
+    </view>
+    <view class="time">{{timeText}}</view>
+    <view class="cbtn" catchtap="onPrev">⏮</view>
+    <view class="cbtn play" catchtap="onToggle">{{playing ? '❚❚' : '▶'}}</view>
+    <view class="cbtn" catchtap="onNext">⏭</view>
+  </view>
+</view>

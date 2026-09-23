@@ -1,0 +1,5 @@
+<view class="wrap {{theme}}">
+  <view wx:if="{{loading}}" class="loading">加载中…</view>
+  <view wx:elif="{{error}}" class="error">{{error}}</view>
+  <music-bar theme="{{theme}}" />
+</view>

@@ -1,11 +1,14 @@
 {
   "pages": [
+    "pages/gateway/gateway",
+    "pages/speaker/speaker",
+    "pages/devices/devices",
     "pages/index/index",
     "pages/logs/logs"
   ],
   "window": {
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "Weixin",
+    "navigationBarTitleText": "小讯音箱",
     "navigationBarBackgroundColor": "#ffffff"
   },
   "componentFramework": "glass-easel",

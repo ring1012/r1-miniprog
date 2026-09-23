@@ -1,0 +1,12 @@
+.wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #0a0a0a; }
+.loading { color: #a3a3a3; font-size: 28rpx; }
+.error { color: #f87171; font-size: 28rpx; }
+/* 浅色主题覆盖 */
+.wrap.light { background: #f5f5f5; }
+.wrap.light .loading { color: #666; }
+.wrap.purple { background: #150f22; }
+.wrap.purple .loading { color: #b7a8d9; }
+.wrap.blue { background: #0a141f; }
+.wrap.blue .loading { color: #93b4cc; }
+.wrap.green { background: #0a1512; }
+.wrap.green .loading { color: #93c4ab; }

@@ -1,0 +1,56 @@
+<view class="wrap {{theme}}">
+  <view class="header">
+    <view class="title">{{pickMode ? '选择音箱' : '设备管理'}}</view>
+    <view class="avatar-wrap">
+      <view class="avatar" bindtap="toggleAvatarMenu">🧑‍💻</view>
+      <view wx:if="{{menuOpen}}" class="menu-mask" bindtap="closeAvatarMenu"></view>
+      <view wx:if="{{menuOpen}}" class="menu">
+        <view class="menu-item" bindtap="onMenuManage">🔧 设备管理</view>
+        <view class="menu-item" bindtap="onMenuTheme">🌗 切换主题</view>
+      </view>
+    </view>
+  </view>
+  <view wx:if="{{loading}}" class="tip">加载中…</view>
+  <view wx:elif="{{list.length === 0}}" class="empty">
+    <view class="tip">暂无设备，点击添加</view>
+    <button bindtap="openAdd" class="btn">添加设备</button>
+  </view>
+  <view wx:else>
+    <view wx:for="{{list}}" wx:key="deviceId" class="card" bindtap="choose" data-id="{{item.deviceId}}">
+      <view class="name">{{item.name}}<text class="go"> ›</text></view>
+      <view class="did">{{item.deviceId}}</view>
+      <view class="row">
+        <text>{{showAuth[item.deviceId] ? item.authCode : '••••'}}</text>
+        <view class="eye" hover-class="eye-hover" catchtap="toggleEye" data-id="{{item.deviceId}}">{{showAuth[item.deviceId] ? '🙈' : '👁️'}}</view>
+      </view>
+      <view wx:if="{{!pickMode}}" class="ops">
+        <button size="mini" catchtap="openEdit" data-id="{{item.deviceId}}">✏️ 编辑</button>
+        <button size="mini" catchtap="remove" data-id="{{item.deviceId}}">🗑️ 删除</button>
+      </view>
+    </view>
+    <button bindtap="openAdd" class="btn">添加设备</button>
+  </view>
+  <view wx:if="{{formVisible}}" class="modal" bindtap="closeForm">
+    <view class="sheet" catchtap="noop">
+      <view class="sheet-title">{{form.isNew ? '添加设备' : '编辑设备'}}</view>
+      <view class="field">
+        <view class="label">deviceId</view>
+        <input class="input" placeholder="音箱 deviceId" value="{{form.deviceId}}" disabled="{{!form.isNew}}" data-field="deviceId" bindinput="onFormInput" />
+        <view wx:if="{{!form.isNew}}" class="hint">deviceId 创建后不可修改</view>
+      </view>
+      <view class="field">
+        <view class="label">authCode</view>
+        <input class="input" placeholder="音箱 authCode" password="{{!showAuth[form.deviceId]}}" value="{{form.authCode}}" data-field="authCode" bindinput="onFormInput" />
+      </view>
+      <view class="field">
+        <view class="label">名称</view>
+        <input class="input" placeholder="默认我的音箱" value="{{form.name}}" data-field="name" bindinput="onFormInput" />
+      </view>
+      <view class="sheet-ops">
+        <button class="btn-secondary" bindtap="closeForm">取消</button>
+        <button class="btn-primary" type="primary" bindtap="submitForm">保存</button>
+      </view>
+    </view>
+  </view>
+  <music-bar theme="{{theme}}" />
+</view>
