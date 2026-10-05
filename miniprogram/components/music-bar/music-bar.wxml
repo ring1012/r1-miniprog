@@ -1,14 +1,13 @@
-<view wx:if="{{hasConn}}" class="bar {{theme}}" bindtap="goPlayer">
-  <view class="prog"><view class="fill" style="width:{{progress}}%"></view></view>
+<view wx:if="{{hasConn}}" class="bar {{theme}} {{playing ? 'is-playing' : ''}}" bindtap="goPlayer" hover-class="bar-hover" hover-stay-time="120">
+  <view class="prog"><view class="fill" style="width:{{progress}}%"></view><view class="dot" style="left:{{progress}}%"></view></view>
   <view class="main">
-    <view class="cover">🎵</view>
-    <view class="meta">
+    <view class="cover pressable" hover-class="press" hover-stay-time="80" catchtap="goCover"><image wx:if="{{cover && !coverError}}" class="cimg" src="{{cover}}" mode="aspectFill" binderror="onCoverError" /><text wx:else class="note">🎵</text><view wx:if="{{playing}}" class="eq"><text class="b1"></text><text class="b2"></text><text class="b3"></text></view></view>
+    <view class="meta" catchtap="goPlayer">
       <view class="t">{{title}}</view>
-      <view class="s">{{sub}}</view>
+      <view class="s"><text class="live {{playing ? 'on' : ''}}"></text>{{sub}} · {{timeText}}</view>
     </view>
-    <view class="time">{{timeText}}</view>
-    <view class="cbtn" catchtap="onPrev">⏮</view>
-    <view class="cbtn play" catchtap="onToggle">{{playing ? '❚❚' : '▶'}}</view>
-    <view class="cbtn" catchtap="onNext">⏭</view>
+    <view class="cbtn pressable" hover-class="press" hover-stay-time="80" catchtap="onPrev"><text class="tic">▍◀</text></view>
+    <view class="cbtn play pressable" hover-class="press" hover-stay-time="80" catchtap="onToggle"><text class="tic big">{{playing ? '❚❚' : '▶'}}</text></view>
+    <view class="cbtn pressable" hover-class="press" hover-stay-time="80" catchtap="onNext"><text class="tic">▶▍</text></view>
   </view>
 </view>

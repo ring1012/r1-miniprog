@@ -1,0 +1,60 @@
+<view class="page {{theme}}">
+  <view class="sec-title">🎶 音乐与歌单</view>
+  <view class="tip">搜歌名 / 歌手，点播后音箱即播。当前队列 {{queueCount}} 首 · {{queueTitle}}</view>
+
+  <view class="sec">📂 我的歌单</view>
+  <view wx:if="{{!serial}}" class="tip">未获取到设备 serial，连接设备后自动加载歌单。</view>
+  <view wx:else>
+    <view wx:if="{{plLoading}}" class="tip">歌单加载中…</view>
+    <picker mode="selector" range="{{plNames}}" value="{{plIdx}}" bindchange="onPlChange">
+      <view class="picker">{{plNames[plIdx] || '请选择歌单…'}}</view>
+    </picker>
+    <view class="plrow">
+      <text class="act" bindtap="toggleCreate">＋ 新建</text>
+      <text class="act play" bindtap="playAllPl">▶ 全部播放</text>
+      <text wx:if="{{currentUuid && currentUuid !== 'default'}}" class="act del" bindtap="deletePl">🗑 删除本单</text>
+    </view>
+    <view wx:if="{{showCreate}}" class="createrow">
+      <input class="sin flex1" value="{{newPlName}}" bindinput="onCreateInput" placeholder="新歌单名称" maxlength="20" />
+      <button class="sbtn sm" bindtap="createPl">创建</button>
+    </view>
+    <view wx:if="{{songsLoading}}" class="tip">歌曲加载中…</view>
+    <view wx:for="{{plSongs}}" wx:key="key" class="song">
+      <view class="meta">
+        <view class="t">{{item.title}}</view>
+        <view class="a">{{item.artist}}</view>
+      </view>
+      <view class="pbtn" data-index="{{index}}" bindtap="playPlSong"><view class="ic ic-play"></view></view>
+      <view class="pbtn danger" data-index="{{index}}" bindtap="removePlSong">🗑</view>
+    </view>
+    <view wx:if="{{!songsLoading && plSongs.length === 0}}" class="tip">本单暂无歌曲，去下方搜索添加。</view>
+  </view>
+
+  <view class="sec">🔍 搜索点播</view>
+  <view class="searchbar">
+    <input class="sin" value="{{keyword}}" bindinput="onKeywordInput" placeholder="搜歌名、歌手..." confirm-type="search" bindconfirm="doSearch" />
+    <button class="sbtn" bindtap="doSearch" loading="{{searching}}" disabled="{{searching}}">{{searching ? '搜索中' : '搜索'}}</button>
+  </view>
+
+  <view wx:if="{{results.length > 0}}" class="rowhead">
+    <text>搜索结果（{{results.length}}）</text>
+    <text class="playall" bindtap="playAll">▶ 全部播放</text>
+  </view>
+  <view wx:for="{{results}}" wx:key="key" class="song">
+    <view class="meta">
+      <view class="t">{{item.title}}</view>
+      <view class="a">{{item.artist}}</view>
+    </view>
+    <view class="pbtn" data-index="{{index}}" bindtap="openAdd">＋</view>
+    <view class="pbtn" data-index="{{index}}" bindtap="playOne"><view class="ic ic-play"></view></view>
+  </view>
+  <view wx:if="{{!searching && results.length === 0}}" class="tip">输入关键词开始搜索。</view>
+
+  <view wx:if="{{addIdx >= 0}}" class="modal" bindtap="closeAdd">
+    <view class="sheet" catchtap="noop">
+      <view class="sheet-title">加入到哪个歌单？</view>
+      <view wx:for="{{playlists}}" wx:key="uuid" class="plpick" data-uuid="{{item.uuid}}" bindtap="addToPl">{{item.name}}</view>
+    </view>
+  </view>
+  <music-bar theme="{{theme}}" />
+</view>

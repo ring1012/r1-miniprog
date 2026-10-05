@@ -1,0 +1,13 @@
+<view class="page {{theme}}">
+  <view class="sec-title">📡 添加局域网设备</view>
+  <view class="tip">手机和音箱连上同一个 Wi-Fi，就可以直连控制，不经过云端，速度更快。只存本机，不上报服务器。</view>
+
+  <view class="lb">备注名</view>
+  <input class="in" value="{{name}}" bindinput="onNameInput" placeholder="局域网音箱" />
+  <view class="lb">音箱 IP</view>
+  <input class="in" value="{{ipInput}}" bindinput="onInput" placeholder="192.168.1.5" confirm-type="done" bindconfirm="test" />
+  <button class="btn" bindtap="test" loading="{{testing}}" disabled="{{testing}}">连接测试</button>
+  <view wx:if="{{testResult}}" class="tip">{{testResult}}</view>
+
+  <button class="btn primary" bindtap="save">保存并进入</button>
+</view>

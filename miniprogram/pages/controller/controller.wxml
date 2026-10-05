@@ -1,0 +1,37 @@
+<view class="page {{theme}}">
+  <view class="sec-title">🎛️ 小讯控制器</view>
+  <view class="tip">控制代码从线上获取，select 选择后按规则填可改字段，发送即透传（message.send）。日常播放请用「正在播放」页。</view>
+
+  <view class="sec">控制代码</view>
+  <view wx:if="{{loadingCmds}}" class="tip">控制代码加载中…</view>
+  <view wx:if="{{cmdsError}}" class="tip">{{cmdsError}}</view>
+  <picker mode="selector" range="{{cmdNames}}" value="{{selIdx}}" bindchange="onCmdChange">
+    <view class="picker">{{cmdNames[selIdx]}}</view>
+  </picker>
+
+  <view wx:if="{{selectedName}}">
+    <view class="sec">{{selectedName}}</view>
+    <view class="row">
+      <view class="field">
+        <view class="lb">what{{locked.what ? ' 🔒' : ''}}</view>
+        <input class="in" value="{{form.what}}" data-field="what" bindinput="onFormInput" type="number" disabled="{{locked.what}}" />
+      </view>
+      <view class="field">
+        <view class="lb">arg1{{locked.arg1 ? ' 🔒' : ''}}</view>
+        <input class="in" value="{{form.arg1}}" data-field="arg1" bindinput="onFormInput" type="number" disabled="{{locked.arg1}}" />
+      </view>
+      <view class="field">
+        <view class="lb">arg2{{locked.arg2 ? ' 🔒' : ''}}</view>
+        <input class="in" value="{{form.arg2}}" data-field="arg2" bindinput="onFormInput" type="number" disabled="{{locked.arg2}}" />
+      </view>
+    </view>
+    <view class="lb">obj{{locked.obj ? ' 🔒' : ''}}</view>
+    <textarea class="ta" value="{{form.obj}}" data-field="obj" bindinput="onFormInput" auto-height disabled="{{locked.obj}}" />
+    <button class="btn" bindtap="submitForm" loading="{{sending}}" disabled="{{sending}}">发送</button>
+  </view>
+
+  <view class="sec">收发日志 <text class="clr" bindtap="clearLogs">清空</text></view>
+  <view wx:if="{{logs.length === 0}}" class="tip">暂无记录（what=100 的消息会有回声）。</view>
+  <view wx:for="{{logs}}" wx:key="index" class="log"><text class="lt">{{item.time}}</text><text>{{item.text}}</text></view>
+  <music-bar theme="{{theme}}" />
+</view>

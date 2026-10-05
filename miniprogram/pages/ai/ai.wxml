@@ -1,0 +1,29 @@
+<view class="page {{theme}}">
+  <view class="sec-title">🤖 AI配置</view>
+  <view class="tip">OpenAI 协议兼容的大模型均可（Gemini 暂不支持）。保存前需先验证连通，验证通过自动启用 AI。</view>
+
+  <view class="switchrow">
+    <text>AI 功能（{{enabled ? '已启用' : '已禁用'}}）</text>
+    <switch checked="{{enabled}}" bindchange="onToggleEnabled" />
+  </view>
+
+  <view class="lb">Endpoint</view>
+  <input class="in" value="{{form.endpoint}}" data-field="endpoint" bindinput="onInput" placeholder="https://..." />
+  <view class="lb">API Key</view>
+  <input class="in" value="{{form.key}}" data-field="key" bindinput="onInput" password placeholder="sk-..." />
+  <view class="lb">Model</view>
+  <input class="in" value="{{form.model}}" data-field="model" bindinput="onInput" placeholder="模型名" />
+  <view class="lb">System Prompt</view>
+  <textarea class="ta" value="{{form.systemPrompt}}" data-field="systemPrompt" bindinput="onInput" auto-height />
+  <view class="lb">Extra Body（JSON）</view>
+  <textarea class="ta" value="{{form.extraBody}}" data-field="extraBody" bindinput="onInput" auto-height placeholder='{"enable_thinking":false}' />
+  <view class="lb">CDN（可选）</view>
+  <input class="in" value="{{form.cdn}}" data-field="cdn" bindinput="onInput" placeholder="留空则直连" />
+
+  <button class="btn ghost" bindtap="verify" disabled="{{verifying || isLan}}">{{verifying ? '验证中…' : (verified ? '已验证 ✓' : (isLan ? '局域网免验证' : '验证连接'))}}</button>
+  <view wx:if="{{verifyMsg}}" class="verify-msg {{verified ? 'ok' : ''}}">{{verifyMsg}}</view>
+  <view wx:if="{{isLan}}" class="tip">局域网端点无法在线验证，确认可用后可直接保存。</view>
+
+  <button class="btn" bindtap="save" disabled="{{!verified && !isLan}}">保存{{saved ? ' ✓' : ''}}{{!verified && !isLan ? '（请先验证）' : ''}}</button>
+  <music-bar theme="{{theme}}" />
+</view>

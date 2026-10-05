@@ -2,10 +2,35 @@
 import { loginOnce } from './utils/api';
 import { logger } from './utils/logger';
 
+function checkUpdate() {
+  try {
+    const um = wx.getUpdateManager();
+    um.onCheckForUpdate((res) => {
+      logger.debug('[app] checkUpdate hasUpdate:', res.hasUpdate);
+    });
+    um.onUpdateReady(() => {
+      logger.info('[app] update ready, ask restart');
+      wx.showModal({
+        title: '新版本已就绪',
+        content: '重启应用以使用最新版本？',
+        success: (r) => {
+          if (r.confirm) um.applyUpdate();
+        },
+      });
+    });
+    um.onUpdateFailed(() => {
+      logger.error('[app] update failed');
+      wx.showToast({ title: '新版本下载失败，请稍后重试', icon: 'none' });
+    });
+  } catch (e) {
+    logger.error('[app] updateManager unsupported', e);
+  }
+}
+
 App<IAppOption>({
   globalData: {},
   onLaunch() {
-    // 展示本地存储能力
+    checkUpdate();
     const logs = wx.getStorageSync('logs') || []
     logs.unshift(Date.now())
     wx.setStorageSync('logs', logs)

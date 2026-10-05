@@ -2,10 +2,15 @@ import { ensureMnpUserId, queryDevices, bindDevice, unbindDevice, MnpDevice } fr
 import { verifyDevice } from '../../utils/verify';
 import { getWs } from '../../utils/ws-client';
 import { getTheme, setTheme, applyNavBar, THEMES, Theme } from '../../utils/theme';
+import { logger } from '../../utils/logger';
+import { getLanDevices, removeLanDevice, getActive, setActive, clearActive, LanDevice } from '../../utils/mode';
 
 Component({
   data: {
     list: [] as MnpDevice[],
+    lanList: [] as LanDevice[],
+    activeKind: 'cloud' as string,
+    activeId: '' as string,
     showAuth: {} as Record<string, boolean>,
     pickMode: false,
     loading: true,
@@ -22,12 +27,23 @@ Component({
       const pick = ((options && options.pick) || '') === '1';
       this.setData({ pickMode: pick, theme });
       applyNavBar(theme);
+      logger.debug('[devices] onLoad');
       void this.load();
     },
     onShow() {
       const theme = getTheme();
       if (theme !== this.data.theme) this.setData({ theme });
       applyNavBar(theme);
+      // 返回时刷新本地局域网列表与选中态（lan 页保存后回来即见）
+      this.setData({
+        lanList: (getLanDevices() as never),
+      });
+      // 删的是公网当前设备时 active 可能已顺延，这里只做展示同步
+      const shown = getActive();
+      this.setData({
+        activeKind: ((shown ? shown.kind : 'cloud') as never),
+        activeId: ((shown ? shown.deviceId : '') as never),
+      });
     },
     async load() {
       // 缓存先行秒开，后台刷新补新（stale-while-revalidate），避免两次网络串行堵首屏
@@ -195,6 +211,13 @@ Component({
           if (next) wx.setStorageSync('activeDeviceId', next);
           else wx.removeStorageSync('activeDeviceId');
         }
+        // 同步选中指针：删的是当前设备则顺延/清空
+        const sel = getActive();
+        if (sel && sel.kind === 'cloud' && sel.deviceId === id) {
+          const next = (res.list[0] && res.list[0].deviceId) || '';
+          if (next) setActive('cloud', next);
+          else clearActive();
+        }
         this.setData({ list: res.list });
         try {
           wx.setStorageSync('deviceListCache', { user: mnpUserId, list: res.list });
@@ -208,13 +231,51 @@ Component({
     },
 
     choose(e: WechatMiniprogram.CustomEvent) {
-      // 卡片点击即进入设备（选择模式/管理模式一致）
+      // 公网卡片点击即进入设备（选择模式/管理模式一致）
       const id = (e.currentTarget.dataset.id || '') as string;
       const found = (this.data.list as MnpDevice[]).find((d) => d.deviceId === id);
       if (!found) return;
+      logger.debug('[devices] choose cloud:', id);
+      setActive('cloud', found.deviceId);
       wx.setStorageSync('activeDeviceId', found.deviceId);
       wx.setStorageSync('currentDevice', found);
       wx.redirectTo({ url: `/pages/speaker/speaker?deviceId=${encodeURIComponent(found.deviceId)}` });
+    },
+
+    chooseLan(e: WechatMiniprogram.CustomEvent) {
+      // 局域网卡片：只写本地选中指针，不碰服务器
+      const id = (e.currentTarget.dataset.id || '') as string;
+      const found = (this.data.lanList as LanDevice[]).find((d) => d.deviceId === id);
+      if (!found) return;
+      logger.debug('[devices] choose lan:', id);
+      setActive('lan', found.deviceId);
+      wx.redirectTo({ url: '/pages/speaker/speaker' });
+    },
+
+    async removeLan(e: WechatMiniprogram.CustomEvent) {
+      const id = (e.currentTarget.dataset.id || '') as string;
+      const confirm = await new Promise<boolean>((resolve) => {
+        wx.showModal({
+          title: '删除局域网设备？',
+          content: id + '（仅删本地记录）',
+          success: (r) => resolve(r.confirm),
+          fail: () => resolve(false),
+        });
+      });
+      if (!confirm) return;
+      const list = removeLanDevice(id);
+      logger.debug('[devices] remove lan:', id);
+      const active = getActive();
+      this.setData({
+        lanList: (list as never),
+        activeKind: ((active ? active.kind : 'cloud') as never),
+        activeId: ((active ? active.deviceId : '') as never),
+      });
+      wx.showToast({ title: '已删除', icon: 'success' });
+    },
+
+    goLanAdd() {
+      wx.navigateTo({ url: '/pages/lan/lan' });
     },
   },
 });

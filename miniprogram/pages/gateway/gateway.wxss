@@ -1,12 +1,12 @@
-.wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #0a0a0a; }
+.wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(100% 45% at 50% 0%, #161618 0%, #0a0a0a 55%); }
 .loading { color: #a3a3a3; font-size: 28rpx; }
 .error { color: #f87171; font-size: 28rpx; }
 /* 浅色主题覆盖 */
-.wrap.light { background: #f5f5f5; }
+.wrap.light { background: radial-gradient(100% 45% at 50% 0%, #ffffff 0%, #edf0f4 55%); }
 .wrap.light .loading { color: #666; }
-.wrap.purple { background: #150f22; }
+.wrap.purple { background: radial-gradient(100% 45% at 50% 0%, #2a1a48 0%, #150f22 55%); }
 .wrap.purple .loading { color: #b7a8d9; }
-.wrap.blue { background: #0a141f; }
+.wrap.blue { background: radial-gradient(100% 45% at 50% 0%, #122c44 0%, #0a141f 55%); }
 .wrap.blue .loading { color: #93b4cc; }
-.wrap.green { background: #0a1512; }
+.wrap.green { background: radial-gradient(100% 45% at 50% 0%, #122c20 0%, #0a1512 55%); }
 .wrap.green .loading { color: #93c4ab; }

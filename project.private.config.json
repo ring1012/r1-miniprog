@@ -3,7 +3,7 @@
   "projectname": "r1-miniprog",
   "setting": {
     "compileHotReLoad": true,
-    "urlCheck": true,
+    "urlCheck": false,
     "coverView": false,
     "lazyloadPlaceholderEnable": false,
     "skylineRenderEnable": true,
@@ -18,5 +18,6 @@
     "useLanDebug": false,
     "ignoreDevUnusedFiles": true
   },
-  "libVersion": "3.17.3"
+  "libVersion": "3.17.3",
+  "condition": {}
 }

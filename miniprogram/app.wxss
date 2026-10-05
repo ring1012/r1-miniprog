@@ -7,4 +7,68 @@
   justify-content: space-between;
   padding: 200rpx 0;
   box-sizing: border-box;
+}
+
+/* ===== 全局触摸反馈：所有可点元素统一缩放压感 =====
+   用法：<view class="cbtn pressable" hover-class="press" bindtap="..."> */
+.pressable { transition: transform .16s ease, opacity .16s ease, background-color .16s ease, box-shadow .16s ease; }
+.press, .pressable:active { transform: scale(.92); opacity: .82; }
+.btn-press { transition: transform .16s ease, opacity .16s ease, filter .16s ease; }
+.btn-press:active { transform: scale(.96); opacity: .9; filter: brightness(1.08); }
+/* button 原生组件去掉默认边框，避免主题色被盖住 */
+button::after { border: none; }
+
+/* ===== 玻璃拟态：半透明底 + 毛玻璃 + 柔光阴影 =====
+   各页卡片/面板底色改为 rgba 后叠加此类即可 */
+.glass {
+  -webkit-backdrop-filter: blur(24rpx);
+  backdrop-filter: blur(24rpx);
+}
+
+/* ===== CSS 矢量播放图标：颜色用 inherit 取父级 color（currentColor 在此 WXSS 环境解析失败）=====
+   em 单位，图标大小 = 自身 font-size，天然居中，不受 emoji 字体坑位影响。
+   用法：<view class="cbtn"><view class="ic ic-play"></view></view> */
+.ic { display: block; flex-shrink: 0; }
+/* ▶ 播放三角（视觉重心偏左，右移一点做光学居中） */
+.ic-play {
+  width: 0; height: 0;
+  border-top: .5em solid transparent;
+  border-bottom: .5em solid transparent;
+  border-left: .78em solid;
+  border-left-color: inherit;
+  transform: translateX(.09em);
+}
+/* ❚❚ 暂停双条（双伪元素实色条） */
+.ic-pause { position: relative; width: .74em; height: .82em; }
+.ic-pause::before, .ic-pause::after {
+  content: ''; position: absolute; top: 0; width: .27em; height: 100%;
+  border-radius: .12em; background-color: inherit;
+}
+.ic-pause::before { left: 0; }
+.ic-pause::after { right: 0; }
+/* ⏮ 上一首：左短条 + 左尖三角 */
+.ic-prev { position: relative; width: 1em; height: .82em; }
+.ic-prev::before {
+  content: ''; position: absolute; left: .02em; top: 0;
+  width: .2em; height: 100%; border-radius: .1em; background-color: inherit;
+}
+.ic-prev::after {
+  content: ''; position: absolute; right: .02em; top: 0;
+  border-top: .41em solid transparent;
+  border-bottom: .41em solid transparent;
+  border-right: .62em solid;
+  border-right-color: inherit;
+}
+/* ⏭ 下一首：右尖三角 + 右短条 */
+.ic-next { position: relative; width: 1em; height: .82em; }
+.ic-next::before {
+  content: ''; position: absolute; left: .02em; top: 0;
+  border-top: .41em solid transparent;
+  border-bottom: .41em solid transparent;
+  border-left: .62em solid;
+  border-left-color: inherit;
+}
+.ic-next::after {
+  content: ''; position: absolute; right: .02em; top: 0;
+  width: .2em; height: 100%; border-radius: .1em; background-color: inherit;
 } 

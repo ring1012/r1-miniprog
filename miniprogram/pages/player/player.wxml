@@ -1,0 +1,75 @@
+<view class="page {{theme}}">
+  <view class="nav"><view class="sec-title">🎵 正在播放</view><view class="status {{playing ? 'on' : ''}}"><text class="dot"></text>{{statusStr}}</view></view>
+  <view wx:if="{{loading}}" class="tip">加载中…</view>
+
+  <view class="hero">
+    <view class="stage">
+      <view wx:if="{{!showLyrics}}" class="vinyl {{playing ? 'spin' : ''}}" bindtap="toggleLyrics">
+        <view class="ring"></view>
+        <image wx:if="{{cover && !coverError}}" class="disc-art" src="{{cover}}" mode="aspectFill" binderror="onCoverError" />
+        <view wx:else class="disc-fallback"><text class="note">🎵</text></view>
+        <view class="grooves"></view>
+        <view class="disc-hole"><view class="hole-dot"></view></view>
+      </view>
+      <scroll-view wx:else class="lrcbox" scroll-y scroll-top="{{lrcScrollTop}}" scroll-with-animation bindtap="toggleLyrics">
+        <view wx:if="{{lyricLoading}}" class="tip">歌词加载中…</view>
+        <view wx:if="{{!lyricLoading && lyrics.length > 0}}" wx:for="{{lyrics}}" wx:key="index" id="lrc{{index}}" class="lrcline {{index === lyricIdx ? 'cur lrc-c' + (index % 30) : ''}}">{{item.text}}</view>
+        <view wx:if="{{!lyricLoading && lyrics.length === 0}}" class="tip">暂无歌词（仅 kuwo / youtube / lx 源支持）</view>
+      </scroll-view>
+    </view>
+    <view class="song">{{title}}</view>
+    <view class="artist">{{artist}}{{album ? ' · ' + album : ''}}</view>
+    <view class="badges"><text class="badge">{{statusStr}}</text><text class="badge">{{modeStr}}</text></view>
+    <view class="tip lyric-tip" bindtap="toggleLyrics">{{showLyrics ? '点击歌词返回封面' : '点击封面显示歌词'}}</view>
+  </view>
+
+  <view class="panel glass progress-panel">
+    <view class="barzone" bindtap="onBarSeek">
+      <view class="bar"><view class="bar-fill" style="width:{{progress}}%"></view><view class="bar-dot" style="left:{{progress}}%"></view></view>
+    </view>
+    <view class="time-row"><text>{{curText}}</text><text>{{totalText}}</text></view>
+    <view class="ctrls">
+      <view class="cbtn pressable" hover-class="press" hover-stay-time="80" bindtap="onPrev"><view class="ic ic-prev"></view></view>
+      <view class="cbtn big pressable" hover-class="press" hover-stay-time="80" bindtap="onToggle"><view wx:if="{{playing}}" class="ic ic-pause"></view><view wx:else class="ic ic-play"></view></view>
+      <view class="cbtn pressable" hover-class="press" hover-stay-time="80" bindtap="onNext"><view class="ic ic-next"></view></view>
+    </view>
+    <view class="ctrls sub">
+      <view class="cbtn sm pressable" hover-class="press" hover-stay-time="80" bindtap="toggleMode">🔁 {{modeStr}}</view>
+      <view class="cbtn sm pressable" hover-class="press" hover-stay-time="80" bindtap="toggleQueue">📋 队列({{queue.length}})</view>
+    </view>
+  </view>
+
+  <view wx:if="{{showQueue}}" class="panel glass">
+    <view class="rowhead"><text>播放队列</text><text class="count">{{queue.length}} 首</text></view>
+    <scroll-view class="qlist" scroll-y>
+      <view wx:for="{{queue}}" wx:key="index" class="qitem pressable {{index === queueIndex ? 'cur' : ''}}" hover-class="press" data-index="{{index}}" bindtap="playIndex">
+        <text class="qn">{{index + 1}}. {{item.title || '未知曲名'}}</text>
+        <text class="qa">{{item.artist || ''}}</text>
+      </view>
+    </scroll-view>
+    <view wx:if="{{queue.length === 0}}" class="tip">队列为空</view>
+  </view>
+
+  <view class="panel glass">
+    <view class="row"><text>🔊 音量 {{volume}}/{{volumeMax}}</text></view>
+    <view class="row">
+      <view class="cbtn sm stepper pressable" hover-class="press" hover-stay-time="80" data-d="-1" bindtap="volStep">−</view>
+      <slider class="sl flex1" min="0" max="{{volumeMax}}" step="1" value="{{volume}}" bindchange="onVolume" block-size="16" />
+      <view class="cbtn sm stepper pressable" hover-class="press" hover-stay-time="80" data-d="1" bindtap="volStep">＋</view>
+    </view>
+  </view>
+
+  <view class="panel glass">
+    <view class="row"><text>🎚️ 均衡器（dB）</text></view>
+    <view class="lb">预设效果</view>
+    <picker mode="selector" range="{{presetNames}}" value="{{presetIdx}}" bindchange="onPresetChange">
+      <view class="picker">{{presetNames[presetIdx]}}</view>
+    </picker>
+    <view wx:for="{{bands}}" wx:key="key" class="eqrow">
+      <text class="eqk">{{bandLabels[item.key] || item.key}}</text>
+      <slider class="sl flex1" min="-15" max="15" step="1" value="{{item.value}}" data-key="{{item.key}}" bindchange="onBand" block-size="14" />
+      <text class="eqv">{{item.value}}</text>
+    </view>
+    <view wx:if="{{bands.length === 0}}" class="tip">EQ 数据未就绪</view>
+  </view>
+</view>

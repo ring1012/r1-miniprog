@@ -1,0 +1,24 @@
+<view class="page {{theme}}">
+  <view class="sec-title">🆙 版本管理</view>
+  <view class="tip">升级是后台异步的：受理后请等待几分钟，下拉/重进本页对比版本确认。</view>
+
+  <view class="card">
+    <view class="card-title">控制器版本（echo）</view>
+    <view class="ver">当前：{{echoText}}</view>
+    <view class="ver">最新：{{latestEchoText}} </view>
+    <button wx:if="{{needEcho}}" class="btn" data-which="echo" bindtap="upgrade" loading="{{upgrading === 'new_echo.apk'}}">升级控制器</button>
+    <view wx:elif="{{latestEcho}}" class="tip">已是最新</view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">语音模组版本（unisound）</view>
+    <view class="ver">当前：{{unisoundText}}</view>
+    <view class="ver">最新：{{latestUniText}} </view>
+    <button wx:if="{{needUni}}" class="btn" data-which="uni" bindtap="upgrade" loading="{{upgrading === 'new_uni.apk'}}">升级语音模组</button>
+    <view wx:elif="{{latestUni}}" class="tip">已是最新（0 表示未记录）</view>
+  </view>
+
+  <view wx:if="{{latestError}}" class="tip">{{latestError}}</view>
+  <button class="ghost" bindtap="refresh">↻ 重新读取当前版本</button>
+  <music-bar theme="{{theme}}" />
+</view>

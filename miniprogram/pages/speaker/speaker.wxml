@@ -4,11 +4,11 @@
       <view class="menubtn" bindtap="toggleDrawer">☰</view>
       <view>
         <view class="dev-name">{{device ? device.name : '小讯音箱'}}</view>
-        <view class="dev-sub">{{device ? device.deviceId : ''}} · {{connState}}</view>
+        <view class="dev-sub">{{isLan ? '📡 局域网' : '🌐 公网'}} · {{device ? device.deviceId : ''}} · {{connState}}</view>
       </view>
     </view>
     <view class="avatar-wrap">
-      <view class="avatar" bindtap="toggleMenu">🧑‍💻</view>
+      <view class="avatar" bindtap="toggleMenu">👤</view>
       <view wx:if="{{menuOpen}}" class="menu-mask" bindtap="closeMenu"></view>
       <view wx:if="{{menuOpen}}" class="menu">
         <view class="menu-item" bindtap="onMenuManage">🔧 设备管理</view>
@@ -19,10 +19,18 @@
   <view wx:if="{{drawerOpen}}" class="drawer-mask" bindtap="closeDrawer"></view>
   <view class="drawer {{drawerOpen ? 'open' : ''}}">
     <view class="drawer-head">
-      <view class="avatar">🧑‍💻</view>
+      <view class="avatar">👤</view>
       <view class="drawer-title">小讯音箱</view>
     </view>
-    <view class="menu-item" bindtap="onMenuManage">🔧 设备管理</view>
+    <view class="menu-item" data-url="/pages/player/player" bindtap="goPage">🎵 正在播放</view>
+    <view class="menu-item" data-url="/pages/playlist/playlist" bindtap="goPage">🎶 音乐与歌单</view>
+    <view class="menu-item" data-url="/pages/controller/controller" bindtap="goPage">🎛️ 小讯控制器</view>
+    <view class="menu-item" data-url="/pages/ai/ai" bindtap="goPage">🤖 AI配置</view>
+    <view class="menu-item" data-url="/pages/services/services" bindtap="goPage">🔧 服务配置</view>
+    <view class="menu-item" data-url="/pages/versions/versions" bindtap="goPage">🆙 版本管理</view>
+    <view class="menu-item" data-url="/pages/guide/guide" bindtap="goPage">📖 功能指引</view>
+    <view wx:if="{{isLan}}" class="menu-item" data-url="/pages/sysconfig/sysconfig" bindtap="goPage">⚙️ 系统配置</view>
+    <view class="menu-item" bindtap="onMenuManage">📱 设备管理</view>
     <view class="menu-item" bindtap="onMenuTheme">🌗 切换主题</view>
   </view>
 
@@ -32,11 +40,11 @@
   </view>
 
   <view class="cards">
-    <view class="card">
+    <view class="card pressable" hover-class="press" hover-stay-time="80" data-url="/pages/guide/guide" bindtap="goPage">
       <view class="card-head"><text class="card-icon">📖</text><view class="card-title">功能指引</view></view>
       <view class="card-desc">了解使用前提、AI 服务部署与音乐源自定义。开始控制前建议先阅读指引。</view>
     </view>
-    <view class="card">
+    <view class="card pressable" hover-class="press" hover-stay-time="80" data-url="/pages/controller/controller" bindtap="goPage">
       <view class="card-head"><text class="card-icon">🎛️</text><view class="card-title">小讯控制器</view></view>
       <view class="card-desc">更换音乐源、音量控制、曲目切换等核心功能。即刻开始管理你的 R1 设备。</view>
     </view>
@@ -44,10 +52,17 @@
 
   <view class="support">
     <view class="sec-title">支持与致谢</view>
-    <view class="tip">本软件开发占用大量业余时间，欢迎打赏支持作者。</view>
-    <view class="qr-row">
-      <image src="https://air1.pp.ua/alipay.jpg" class="qr" mode="widthFix" />
-      <image src="https://air1.pp.ua/weixin.jpg" class="qr" mode="widthFix" />
+    <view class="tip">本软件开发占用大量业余时间，欢迎打赏支持作者。点击卡片复制链接，去浏览器粘贴打开。</view>
+    <view class="pay-list">
+      <view class="pay-link ali" data-link="https://qr.alipay.com/fkx122578ww7brif9jptr96" data-name="支付宝" data-tip="已复制，去浏览器粘贴打开" bindtap="copyPayLink">
+        <view class="pay-title">💙 支付宝打赏 · 点击复制</view>
+        <view class="pay-url" selectable>https://qr.alipay.com/fkx122578ww7brif9jptr96</view>
+      </view>
+      <view class="pay-link wx" data-link="https://air1.pp.ua/weixin.jpg" data-name="微信" data-tip="已复制，去浏览器粘贴打开" bindtap="copyPayLink">
+        <view class="pay-title">💚 微信打赏 · 点击复制</view>
+        <view class="pay-url" selectable>https://air1.pp.ua/weixin.jpg</view>
+        <view class="pay-hint">微信收款码为图片链接：在浏览器打开后长按识别二维码即可付款。</view>
+      </view>
     </view>
   </view>
 
@@ -55,10 +70,12 @@
     <view class="sec-title">支持者致谢墙</view>
     <view class="tip">捐赠累计（非闲鱼）¥{{totalAmount}} · {{totalCount}} 人</view>
     <view wx:if="{{donationError}}" class="tip">{{donationError}}</view>
-    <view wx:for="{{donations}}" wx:key="index" class="donor">
-      <text>{{item.name}}</text>
-      <text>¥{{item.amount}} · {{item.platform}} · {{item.date}}</text>
-    </view>
+    <scroll-view class="wall-list" scroll-y>
+      <view wx:for="{{donations}}" wx:key="index" class="donor">
+        <text>{{item.name}}</text>
+        <text>¥{{item.amount}} · {{item.platform}} · {{item.date}}</text>
+      </view>
+    </scroll-view>
   </view>
   <music-bar theme="{{theme}}" />
 </view>

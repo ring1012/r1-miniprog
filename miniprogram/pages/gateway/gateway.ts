@@ -1,6 +1,7 @@
 import { ensureMnpUserId, queryDevices, bindDevice, MnpDevice } from '../../utils/api';
 import { verifyDevice } from '../../utils/verify';
 import { getTheme, applyNavBar, Theme } from '../../utils/theme';
+import { getActive } from '../../utils/mode';
 
 Page({
   data: {
@@ -20,6 +21,12 @@ Page({
     applyNavBar(theme);
   },
   async route(options: Record<string, string>) {
+    // 局域网设备选中态：不走绑定/登录，直接进 speaker（speaker 内直连）
+    const active = getActive();
+    if (active && active.kind === 'lan') {
+      wx.redirectTo({ url: '/pages/speaker/speaker' });
+      return;
+    }
     const deviceId = (options.deviceId || '').trim();
     const authCode = (options.authCode || '').trim();
     const name = ((options.name || '我的音箱') as string).slice(0, 32);

@@ -1,0 +1,30 @@
+<view class="page {{theme}}">
+  <view class="sec-title">📖 功能指引</view>
+  <view class="tip">开始控制前，建议先读完本页。</view>
+
+  <view class="card">
+    <view class="card-title">1. 使用前提</view>
+    <view class="card-desc">音箱已联网并绑定到你的微信（设备管理页可增删改查）；小程序与音箱经云端长连，操作实时下发，无需同一 Wi-Fi。</view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">2. AI 服务部署</view>
+    <view class="card-desc">在「AI配置」页填写 OpenAI 协议兼容的 endpoint / key / model，打开启用开关。 endpoint 支持 http(s)，音箱侧会自动归一化。</view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">3. 音乐源自定义</view>
+    <view class="card-desc">在「服务配置」页填写音乐源接口地址；在「音乐与歌单」页搜歌名/歌手，点播后音箱即播，播放队列可在「正在播放」页查看切换。</view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">4. 小讯控制器</view>
+    <view class="card-desc">「控制器」页可透传底层消息做调试；日常播放控制请用「正在播放」页与各页底部的悬浮播放条。</view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">5. 版本管理</view>
+    <view class="card-desc">「版本管理」页可查看音箱与语音模组版本；有新版时一键后台升级，升级期间不要断电，完成后重查版本确认。</view>
+  </view>
+  <music-bar theme="{{theme}}" />
+</view>

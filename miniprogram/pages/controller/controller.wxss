@@ -1,0 +1,51 @@
+.page { min-height: 100vh; background: radial-gradient(100% 45% at 50% 0%, #161618 0%, #0a0a0a 55%); padding: 32rpx; padding-bottom: 170rpx; }
+.sec-title { color: #fff; font-size: 38rpx; font-weight: 900; margin-bottom: 8rpx; }
+.tip { color: #737373; font-size: 26rpx; margin-bottom: 16rpx; }
+.sec { color: #fff; font-size: 30rpx; font-weight: bold; margin: 28rpx 0 16rpx; }
+.picker { background: rgba(10,10,10,.6); border: 1rpx solid rgba(255,255,255,.1); border-radius: 12rpx; color: #fff; padding: 16rpx; font-size: 28rpx; box-shadow: inset 0 2rpx 8rpx rgba(0,0,0,.4); }
+.row { display: flex; gap: 16rpx; }
+.field { flex: 1; }
+.lb { color: #a3a3a3; font-size: 24rpx; margin: 12rpx 0 8rpx; }
+.in { background: rgba(23,23,23,.7); border: 1rpx solid rgba(255,255,255,.1); border-radius: 12rpx; color: #fff; padding: 0 16rpx; height: 88rpx; line-height: 88rpx; font-size: 28rpx; box-sizing: border-box; box-shadow: inset 0 2rpx 8rpx rgba(0,0,0,.4); }
+.ta { background: rgba(23,23,23,.7); border: 1rpx solid rgba(255,255,255,.1); border-radius: 12rpx; color: #fff; padding: 16rpx; font-size: 28rpx; width: 100%; box-sizing: border-box; box-shadow: inset 0 2rpx 8rpx rgba(0,0,0,.4); }
+.in[disabled], .ta[disabled] { opacity: .45; }
+.btn { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #fff; border-radius: 16rpx; margin-top: 20rpx; font-size: 30rpx; box-shadow: 0 8rpx 24rpx rgba(139,92,246,.35), inset 0 1rpx 0 rgba(255,255,255,.25); }
+.clr { color: #a78bfa; font-size: 24rpx; margin-left: 16rpx; }
+.log { color: #d4d4d4; font-size: 26rpx; padding: 12rpx 0; border-bottom: 1rpx solid #1f1f1f; }
+.lt { color: #737373; margin-right: 12rpx; }
+.page.light { background: radial-gradient(100% 45% at 50% 0%, #ffffff 0%, #edf0f4 55%); }
+.page.light .sec-title, .page.light .sec { color: #111; }
+.page.light .tip, .page.light .lb { color: #666; }
+.page.light .preset { background: rgba(255,255,255,.8); border-color: rgba(17,17,17,.07); color: #333; box-shadow: 0 8rpx 24rpx rgba(0,0,0,.07), inset 0 1rpx 0 rgba(255,255,255,.7); }
+.page.light .in, .page.light .ta, .page.light .picker { background: rgba(255,255,255,.8); border-color: #ddd; color: #111; box-shadow: inset 0 2rpx 6rpx rgba(0,0,0,.06); }
+.page.light .log { color: #333; border-color: #eee; }
+/* 触摸反馈 */
+.btn { transition: transform .15s ease, opacity .15s ease, background-color .15s ease; }
+.btn:active { transform: scale(.97); opacity: .9; filter: brightness(1.08); }
+/* 紫色 */
+.page.purple { background: radial-gradient(100% 45% at 50% 0%, #2a1a48 0%, #150f22 55%); }
+.page.purple .sec-title, .page.purple .sec { color: #f3efff; }
+.page.purple .tip, .page.purple .lb { color: #b7a8d9; }
+.page.purple .in, .page.purple .ta, .page.purple .picker { background: rgba(33,23,54,.7); border-color: #3a2b5c; color: #f3efff; }
+.page.purple .btn { background: linear-gradient(135deg, #8b5cf6, #7c3aed); box-shadow: 0 8rpx 24rpx rgba(139,92,246,.35), inset 0 1rpx 0 rgba(255,255,255,.25); }
+.page.purple .clr { color: #c4b5fd; }
+.page.purple .log { color: #cfc2ee; border-color: #3a2b5c; }
+.page.purple .lt { color: #8d7bb5; }
+/* 蓝色 */
+.page.blue { background: radial-gradient(100% 45% at 50% 0%, #122c44 0%, #0a141f 55%); }
+.page.blue .sec-title, .page.blue .sec { color: #eef6ff; }
+.page.blue .tip, .page.blue .lb { color: #93b4cc; }
+.page.blue .in, .page.blue .ta, .page.blue .picker { background: rgba(16,32,47,.7); border-color: #1e3a52; color: #eef6ff; }
+.page.blue .btn { background: linear-gradient(135deg, #38bdf8, #0284c7); box-shadow: 0 8rpx 24rpx rgba(2,132,199,.35), inset 0 1rpx 0 rgba(255,255,255,.25); }
+.page.blue .clr { color: #7dd3fc; }
+.page.blue .log { color: #b9d2e6; border-color: #1e3a52; }
+.page.blue .lt { color: #6b8ba3; }
+/* 绿色 */
+.page.green { background: radial-gradient(100% 45% at 50% 0%, #122c20 0%, #0a1512 55%); }
+.page.green .sec-title, .page.green .sec { color: #effff6; }
+.page.green .tip, .page.green .lb { color: #93c4ab; }
+.page.green .in, .page.green .ta, .page.green .picker { background: rgba(16,36,27,.7); border-color: #1e4d3a; color: #effff6; }
+.page.green .btn { background: linear-gradient(135deg, #34d399, #059669); box-shadow: 0 8rpx 24rpx rgba(5,150,105,.35), inset 0 1rpx 0 rgba(255,255,255,.25); }
+.page.green .clr { color: #6ee7b7; }
+.page.green .log { color: #b5d9c6; border-color: #1e4d3a; }
+.page.green .lt { color: #6f9c86; }

@@ -1,19 +1,41 @@
 import { getWs } from '../../utils/ws-client';
+import { coverUrl } from '../../utils/cover';
 
-interface BarPos {
-  playTimeMs?: number;
-  status?: number;
-  totalTimeMs?: number;
+interface V2Position {
   musicId?: string;
+  music_id?: string;
+  playTimeMs?: number;
+  play_time?: number;
+  totalTimeMs?: number;
+  total_time?: number;
+  status?: number;
 }
 
-interface BarQueue {
-  index?: number;
-  list?: Array<{ title?: string }>;
+interface V2Song {
+  title?: string;
+  artist?: string;
+  itemId?: string;
+  imgUrl?: string;
 }
 
-// 全局悬浮播放条：对标 admin-page MiniPlayer（顶部进度线 + 封面/曲名/状态 + 上一首/播停/下一首）。
-// 数据源走全局 ws 单例 + snapshot，挂载晚也能秒出状态；无连接时自动隐藏。
+interface V2States {
+  playIndex?: number;
+  playList?: V2Song[];
+  playlist?: V2Song[];
+  playMode?: number;
+  playState?: number;
+}
+
+interface PlayerState {
+  position?: V2Position;
+  states?: V2States;
+  volume?: number;
+  serial?: string;
+}
+
+// 全局悬浮播放条：v2 单 type（player.state）驱动。
+// 首屏 snapshot 秒出，无快照才 request 一次；之后不轮询，本地 1s 插值估算进度；
+// 仅在收到 event[player.state] 或操作后以真实帧校准（进度无推送，靠播放器状态回调事件）。
 // 注意：ES5 引擎，只用三元和 if。
 Component({
   properties: {
@@ -26,90 +48,173 @@ Component({
     playing: false,
     progress: 0,
     hasConn: false,
-    pos: null as BarPos | null,
-    queue: null as BarQueue | null,
+    cover: '',
+    coverError: false,
+    state: null as PlayerState | null,
+    tickTimer: null as number | null,
   },
   lifetimes: {
     attached() {
       const ws = getWs();
-      const snapPos = ws.snapshot('playback.position') as BarPos | undefined;
-      const snapQueue = ws.snapshot('playback.queue') as BarQueue | undefined;
-      const snapState = ws.snapshot('playback.state') as {
-        position?: BarPos;
-        queue?: BarQueue;
-      } | undefined;
-      if (snapPos || snapQueue || snapState) {
-        const pos = (snapState && snapState.position ? snapState.position : snapPos) || null;
-        const queue = (snapState && snapState.queue ? snapState.queue : snapQueue) || null;
-        this.setData({ pos: pos as never, queue: queue as never, hasConn: true as never });
-        this.render();
+      const snap = ws.snapshot('player.state') as PlayerState | undefined;
+      if (snap) {
+        this.applyState(snap);
+      } else {
+        ws.request(['player.state']).then(
+          (m) => {
+            const st = (m['player.state'] || null) as PlayerState | null;
+            if (st) this.applyState(st);
+          },
+          () => undefined
+        );
       }
-      ws.on('playback.position', this._onPosition);
-      ws.on('playback.queue', this._onQueue);
-      ws.on('playback.state', this._onState);
-      ws.on('playback.progress', this._onProgress);
+      const self = this;
+      const handler = function (d: unknown) { self._onState(d); };
+      (this as unknown as { _wsHandler: unknown })._wsHandler = handler;
+      ws.on('player.state', handler);
     },
     detached() {
       const ws = getWs();
-      ws.off('playback.position', this._onPosition);
-      ws.off('playback.queue', this._onQueue);
-      ws.off('playback.state', this._onState);
-      ws.off('playback.progress', this._onProgress);
+      const h = (this as unknown as { _wsHandler?: (d: unknown) => void })._wsHandler;
+      if (h) ws.off('player.state', h);
+      this.stopTick();
     },
   },
   methods: {
-    _onPosition(d: unknown) {
-      this.setData({ pos: ((d || null) as BarPos | null) as never, hasConn: true as never });
-      this.render();
-    },
-
-    _onQueue(d: unknown) {
-      this.setData({ queue: ((d || null) as BarQueue | null) as never, hasConn: true as never });
-      this.render();
-    },
-
     _onState(d: unknown) {
-      const s = (d || {}) as { position?: BarPos; queue?: BarQueue };
-      const patch: Record<string, unknown> = {};
-      if (s.position) patch.pos = s.position;
-      if (s.queue) patch.queue = s.queue;
-      patch.hasConn = true;
-      this.setData(patch as never);
-      this.render();
+      const st = ((d || null) as PlayerState | null);
+      if (!st) return;
+      this.applyState(st);
     },
 
-    _onProgress(d: unknown) {
-      const p = (d || {}) as { playTimeMs?: number };
-      const cur = ((this.data.pos || {}) as BarPos);
-      const next: BarPos = {
-        playTimeMs: p.playTimeMs !== undefined ? p.playTimeMs : cur.playTimeMs,
-        status: cur.status,
-        totalTimeMs: cur.totalTimeMs,
-        musicId: cur.musicId,
-      };
-      this.setData({ pos: next as never, hasConn: true as never });
+    applyState(st: PlayerState) {
+      this.setData({ state: (st as never), hasConn: (true as never) });
       this.render();
+      this.restartTick();
+    },
+
+    isPlaying(): boolean {
+      const st = ((this.data.state || {}) as PlayerState);
+      const pos = (st.position || {}) as V2Position;
+      const status = typeof pos.status === 'number' ? pos.status : -1;
+      if (status === 1 || status === 3) return true;
+      const states = (st.states || {}) as V2States;
+      if (typeof states.playState === 'number') {
+        return states.playState === 1 || states.playState === 3;
+      }
+      return false;
+    },
+
+    restartTick() {
+      this.stopTick();
+      if (!this.isPlaying()) return;
+      // 无明确歌曲时长不滚动进度条：等带 totalTimeMs 的事件来校准
+      const st0 = ((this.data.state || null) as PlayerState | null);
+      const p0 = (st0 && st0.position ? st0.position : {}) as V2Position;
+      const t0 = this.num(p0.totalTimeMs !== undefined ? p0.totalTimeMs : p0.total_time, 0);
+      if (t0 <= 0) return;
+      const self = this;
+      const timer = setInterval(function () {
+        const st = ((self.data.state || {}) as PlayerState);
+        const pos = (st.position || {}) as V2Position;
+        const cur = self.num(pos.playTimeMs !== undefined ? pos.playTimeMs : pos.play_time, 0);
+        const total = self.num(pos.totalTimeMs !== undefined ? pos.totalTimeMs : pos.total_time, 0);
+        if (!self.isPlaying()) {
+          self.stopTick();
+          return;
+        }
+        if (total <= 0) {
+          // 事件里时长没了，停止本地插值
+          self.stopTick();
+          self.render();
+          return;
+        }
+        const next = Math.min(cur + 1000, total);
+        const npos: V2Position = {
+          musicId: pos.musicId !== undefined ? pos.musicId : pos.music_id,
+          playTimeMs: next,
+          totalTimeMs: total,
+          status: pos.status,
+        };
+        const nst: PlayerState = {
+          position: npos,
+          states: st.states,
+          volume: st.volume,
+          serial: st.serial,
+        };
+        self.setData({ state: (nst as never) });
+        self.render();
+      }, 1000) as unknown as number;
+      this.setData({ tickTimer: (timer as never) });
+    },
+
+    stopTick() {
+      const t = (this.data.tickTimer as unknown as number | null);
+      if (t !== null && t !== undefined) {
+        try {
+          clearInterval(t);
+        } catch {
+          // ignore
+        }
+        this.setData({ tickTimer: (null as never) });
+      }
+    },
+
+    num(v: unknown, dflt: number): number {
+      const n = Number(v);
+      if (isNaN(n)) return dflt;
+      return n;
+    },
+
+    pickTitle(): string {
+      const st = ((this.data.state || {}) as PlayerState);
+      const states = (st.states || {}) as V2States;
+      const list = states.playList || states.playlist || [];
+      const idx = typeof states.playIndex === 'number' ? states.playIndex : -1;
+      const indexed = idx >= 0 && idx < list.length ? list[idx] : null;
+      const pos = (st.position || {}) as V2Position;
+      if (indexed && indexed.title) return indexed.title;
+      const mid = pos.musicId !== undefined ? pos.musicId : pos.music_id;
+      if (mid) return mid;
+      return '未在播放';
+    },
+
+    pickCover(): string {
+      const st = ((this.data.state || {}) as PlayerState);
+      const states = (st.states || {}) as V2States;
+      const list = states.playList || states.playlist || [];
+      const idx = typeof states.playIndex === 'number' ? states.playIndex : -1;
+      const indexed = idx >= 0 && idx < list.length ? list[idx] : null;
+      if (!indexed) return '';
+      return coverUrl(indexed.imgUrl);
+    },
+
+    onCoverError() {
+      if (!this.data.coverError) this.setData({ coverError: (true as never) });
     },
 
     render() {
-      const pos = ((this.data.pos || {}) as BarPos);
-      const queue = ((this.data.queue || {}) as BarQueue);
-      const list = queue.list || [];
-      const idx = typeof queue.index === 'number' ? queue.index : -1;
-      const indexed = idx >= 0 && idx < list.length ? list[idx] : null;
-      const title = (indexed && indexed.title) || pos.musicId || '未在播放';
-      const playing = pos.status === 1 || pos.status === 3;
-      const total = pos.totalTimeMs || 0;
-      const cur = pos.playTimeMs || 0;
+      const st = ((this.data.state || {}) as PlayerState);
+      const pos = (st.position || {}) as V2Position;
+      const cur = this.num(pos.playTimeMs !== undefined ? pos.playTimeMs : pos.play_time, 0);
+      const total = this.num(pos.totalTimeMs !== undefined ? pos.totalTimeMs : pos.total_time, 0);
+      const playing = this.isPlaying();
       const raw = total > 0 ? Math.round((cur / total) * 100) : 0;
       const progress = raw > 100 ? 100 : raw;
-      this.setData({
-        title: title as never,
-        sub: (playing ? '播放中' : '已暂停') as never,
-        timeText: (this.formatTime(cur) + ' / ' + this.formatTime(total)) as never,
-        playing: playing as never,
-        progress: progress as never,
-      });
+      const right = total > 0 ? this.formatTime(total) : '--:--';
+      const cover = this.pickCover();
+      const oldCover = (this.data.cover as unknown as string) || '';
+      const patch: Record<string, unknown> = {
+        title: this.pickTitle(),
+        sub: playing ? '播放中' : '已暂停',
+        timeText: this.formatTime(cur) + ' / ' + right,
+        playing,
+        progress,
+        cover,
+      };
+      // 切歌时清除旧失败标记，否则 error 态一直兜底 emoji
+      if (cover !== oldCover) patch.coverError = false;
+      this.setData(patch as never);
     },
 
     // 对标 MiniPlayer formatTime：h:mm:ss 或 m:ss（手写补零，老引擎无 padStart）
@@ -124,25 +229,48 @@ Component({
       return min + ':' + ss;
     },
 
+    tap() {
+      try {
+        wx.vibrateShort({ type: 'light' });
+      } catch {
+        // ignore
+      }
+    },
+
     onToggle() {
+      this.tap();
       const playing = this.data.playing as boolean;
-      getWs().send(playing ? 'playback.pause' : 'playback.play');
+      getWs().send(playing ? 'player.pause' : 'player.play');
     },
 
     onPrev() {
-      getWs().send('playback.prev');
+      this.tap();
+      getWs().send('player.prev');
     },
 
     onNext() {
-      getWs().send('playback.next');
+      this.tap();
+      getWs().send('player.next');
     },
 
     goPlayer() {
+      this.tap();
       const pages = getCurrentPages();
       const cur = pages.length ? pages[pages.length - 1] : null;
       const route = cur ? (cur.route || '') : '';
       if (route.indexOf('speaker') >= 0) return;
+      if (route.indexOf('player') >= 0) return;
       wx.navigateTo({ url: '/pages/speaker/speaker' });
+    },
+
+    // 封面专属：直达「正在播放」页（catchtap 阻断冒泡，不会同时触发整条的 goPlayer）
+    goCover() {
+      this.tap();
+      const pages = getCurrentPages();
+      const cur = pages.length ? pages[pages.length - 1] : null;
+      const route = cur ? (cur.route || '') : '';
+      if (route.indexOf('player') >= 0) return;
+      wx.navigateTo({ url: '/pages/player/player' });
     },
   },
 });

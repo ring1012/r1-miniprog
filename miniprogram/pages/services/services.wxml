@@ -1,0 +1,67 @@
+<view class="page {{theme}}">
+  <view class="sec-title">🔧 服务配置</view>
+  <view class="tip">四项第三方服务，表单填写保存即下发，无需手写 JSON。</view>
+
+  <view wx:if="{{loading}}" class="tip">加载中…</view>
+
+  <!-- 天气 -->
+  <view class="card">
+    <view class="card-title">🌤️ 天气服务{{weather.saved ? ' ✓' : ''}}</view>
+    <view class="card-desc">和风天气 endpoint + apiKey，AI 查天气用</view>
+    <view class="lb">服务商</view>
+    <picker mode="selector" range="{{weatherLabels}}" value="{{weather.providerIdx}}" data-section="weather" bindchange="onProviderChange">
+      <view class="picker">{{weatherLabels[weather.providerIdx]}}</view>
+    </picker>
+    <view class="lb">API Endpoint（须 https 开头）</view>
+    <input class="in" value="{{weather.endpoint}}" data-section="weather" data-field="endpoint" bindinput="onInput" placeholder="https://api.qweather.com" />
+    <view class="lb">API Key</view>
+    <input class="in" value="{{weather.apiKey}}" data-section="weather" data-field="apiKey" bindinput="onInput" password placeholder="your-qweather-api-key" />
+    <button class="btn sky" bindtap="saveWeather">保存天气配置</button>
+  </view>
+
+  <!-- 音乐 -->
+  <view class="card">
+    <view class="card-title">🎵 音乐源{{music.saved ? ' ✓' : ''}}</view>
+    <view class="card-desc">AI 点播歌曲的数据来源；本地模式填端点地址</view>
+    <view class="lb">音乐来源</view>
+    <picker mode="selector" range="{{musicLabels}}" value="{{music.providerIdx}}" data-section="music" bindchange="onProviderChange">
+      <view class="picker">{{musicLabels[music.providerIdx]}}</view>
+    </picker>
+    <view class="lb">端点地址（本地模式用，云端可留空）</view>
+    <input class="in" value="{{music.endpoint}}" data-section="music" data-field="endpoint" bindinput="onInput" placeholder="https://..." />
+    <view class="presets">
+      <text wx:for="{{musicPresets}}" wx:key="url" class="preset" data-section="music" data-url="{{item.url}}" bindtap="usePreset">{{item.label}}</text>
+    </view>
+    <button class="btn violet" bindtap="saveMusic">保存音乐配置</button>
+  </view>
+
+  <!-- 故事 -->
+  <view class="card">
+    <view class="card-title">📖 故事源{{story.saved ? ' ✓' : ''}}</view>
+    <view class="card-desc">故事 / 有声接口地址</view>
+    <view class="lb">故事来源</view>
+    <picker mode="selector" range="{{storyLabels}}" value="{{story.providerIdx}}" data-section="story" bindchange="onProviderChange">
+      <view class="picker">{{storyLabels[story.providerIdx]}}</view>
+    </picker>
+    <view class="lb">端点地址（本地模式用，云端可留空）</view>
+    <input class="in" value="{{story.endpoint}}" data-section="story" data-field="endpoint" bindinput="onInput" placeholder="https://..." />
+    <view class="presets">
+      <text wx:for="{{storyPresets}}" wx:key="url" class="preset" data-section="story" data-url="{{item.url}}" bindtap="usePreset">{{item.label}}</text>
+    </view>
+    <button class="btn amber" bindtap="saveStory">保存故事配置</button>
+  </view>
+
+  <!-- HA -->
+  <view class="card">
+    <view class="card-title">🏠 智能家居{{hass.saved ? ' ✓' : ''}}</view>
+    <view class="card-desc">HomeAssistant 对接配置，AI 可控家居设备</view>
+    <view class="lb">HA 地址</view>
+    <input class="in" value="{{hass.ip}}" data-section="hass" data-field="ip" bindinput="onInput" placeholder="http://192.168.2.2:8123" />
+    <view class="lb">长期访问令牌</view>
+    <input class="in" value="{{hass.token}}" data-section="hass" data-field="token" bindinput="onInput" password placeholder="your-long-lived-access-token" />
+    <view class="guide">令牌在 HA「个人资料 → 安全」创建；末尾 / 会自动去除。</view>
+    <button class="btn green" bindtap="saveHass">保存家居配置</button>
+  </view>
+
+  <music-bar theme="{{theme}}" />
+</view>

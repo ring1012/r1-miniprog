@@ -1,0 +1,30 @@
+<view class="page {{theme}}">
+  <view class="sec-title">⚙️ 系统配置</view>
+  <view wx:if="{{!isLan}}" class="tip">本页仅局域网模式可用，公网模式请用「设备管理」。</view>
+  <view wx:if="{{!isLan}}"><button class="btn" bindtap="goLan">去局域网连接</button></view>
+
+  <view wx:if="{{isLan}}">
+    <view class="tip">本机 serial：{{serial || '读取中…'}}</view>
+    <view class="lb">deviceId</view>
+    <input class="in" value="{{form.deviceId}}" data-field="deviceId" bindinput="onInput" />
+    <view class="lb">authCode</view>
+    <view class="authrow">
+      <input class="in flex1" value="{{form.authCode}}" data-field="authCode" bindinput="onInput" password="{{!showAuth}}" />
+      <view class="eye" bindtap="toggleEye">{{showAuth ? '🙈' : '👁️'}}</view>
+    </view>
+    <view class="lb">备注名</view>
+    <input class="in" value="{{form.name}}" data-field="name" bindinput="onInput" />
+    <view class="btnrow">
+      <button class="btn" bindtap="doVerify">校验</button>
+      <button class="btn primary" bindtap="doBind">绑定微信</button>
+    </view>
+    <view wx:if="{{verifyState}}" class="tip">{{verifyState}}</view>
+
+    <view class="sec">已绑定（{{bound.length}}）</view>
+    <view wx:for="{{bound}}" wx:key="deviceId" class="dev">
+      <view><view class="dn">{{item.name}}</view><view class="did">{{item.deviceId}}</view></view>
+      <view class="unbind" data-id="{{item.deviceId}}" bindtap="doUnbind">解绑</view>
+    </view>
+  </view>
+  <music-bar theme="{{theme}}" />
+</view>

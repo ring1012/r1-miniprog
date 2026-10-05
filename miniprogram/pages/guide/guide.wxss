@@ -1,0 +1,28 @@
+.page { min-height: 100vh; background: radial-gradient(100% 45% at 50% 0%, #161618 0%, #0a0a0a 55%); padding: 32rpx; padding-bottom: 170rpx; }
+.sec-title { color: #fff; font-size: 38rpx; font-weight: 900; margin-bottom: 8rpx; }
+.tip { color: #737373; font-size: 26rpx; margin-bottom: 24rpx; }
+.card { background: rgba(23,23,23,.75); -webkit-backdrop-filter: blur(24rpx); backdrop-filter: blur(24rpx); border: 1rpx solid rgba(255,255,255,.09); border-radius: 24rpx; padding: 28rpx; margin-bottom: 20rpx; box-shadow: 0 12rpx 36rpx rgba(0,0,0,.4), inset 0 1rpx 0 rgba(255,255,255,.06); }
+.card-title { color: #fff; font-size: 32rpx; font-weight: bold; margin-bottom: 12rpx; }
+.card-desc { color: #a3a3a3; font-size: 27rpx; line-height: 44rpx; }
+.page.light { background: radial-gradient(100% 45% at 50% 0%, #ffffff 0%, #edf0f4 55%); }
+.page.light .sec-title, .page.light .card-title { color: #111; }
+.page.light .tip, .page.light .card-desc { color: #666; }
+.page.light .card { background: rgba(255,255,255,.8); border-color: rgba(17,17,17,.07); box-shadow: 0 8rpx 28rpx rgba(0,0,0,.08), inset 0 1rpx 0 rgba(255,255,255,.7); }
+/* 触摸反馈 */
+.card { transition: transform .15s ease, opacity .15s ease; }
+.card:active { transform: scale(.98); opacity: .92; }
+/* 紫色 */
+.page.purple { background: radial-gradient(100% 45% at 50% 0%, #2a1a48 0%, #150f22 55%); }
+.page.purple .sec-title, .page.purple .card-title { color: #f3efff; }
+.page.purple .tip, .page.purple .card-desc { color: #b7a8d9; }
+.page.purple .card { background: rgba(33,23,54,.75); border-color: rgba(196,181,253,.16); box-shadow: 0 12rpx 36rpx rgba(0,0,0,.4), inset 0 1rpx 0 rgba(196,181,253,.12); }
+/* 蓝色 */
+.page.blue { background: radial-gradient(100% 45% at 50% 0%, #122c44 0%, #0a141f 55%); }
+.page.blue .sec-title, .page.blue .card-title { color: #eef6ff; }
+.page.blue .tip, .page.blue .card-desc { color: #93b4cc; }
+.page.blue .card { background: rgba(16,32,47,.75); border-color: rgba(125,211,252,.16); box-shadow: 0 12rpx 36rpx rgba(0,0,0,.4), inset 0 1rpx 0 rgba(125,211,252,.12); }
+/* 绿色 */
+.page.green { background: radial-gradient(100% 45% at 50% 0%, #122c20 0%, #0a1512 55%); }
+.page.green .sec-title, .page.green .card-title { color: #effff6; }
+.page.green .tip, .page.green .card-desc { color: #93c4ab; }
+.page.green .card { background: rgba(16,36,27,.75); border-color: rgba(110,231,183,.16); box-shadow: 0 12rpx 36rpx rgba(0,0,0,.4), inset 0 1rpx 0 rgba(110,231,183,.12); }
